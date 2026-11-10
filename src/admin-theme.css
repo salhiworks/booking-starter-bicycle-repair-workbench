@@ -1,0 +1,10 @@
+/*
+ * The packaged dashboard keeps its own design. The site brands it with one
+ * thing — its accent, per appearance (INTEGRATION.md §10). Workbench's marker
+ * colour is a bright yellow, which can't carry text on a white page, so Light
+ * uses the chain-black ink with yellow text (a black workshop tag), and Dark
+ * uses the marker yellow itself with ink text. Owner monogram, primary buttons,
+ * Confirm, focus rings, selection and the schedule's "now" line all follow it.
+ */
+:root .pbe-admin[data-mode='light'] { --pbe-accent: #16191c; --pbe-accent-text: #f2c200; } /* ≈17.6:1 on white; yellow text ≈11.4:1 on ink */
+:root .pbe-admin[data-mode='dark']  { --pbe-accent: #f2c200; --pbe-accent-text: #16191c; } /* ≈11:1 on a near-black dashboard; ink text ≈11.4:1 */

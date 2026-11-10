@@ -1,0 +1,1754 @@
+/*
+ * Chainline Bicycle Workshop — the page (Workbench). Values come from tokens.css.
+ *
+ * A well-kept workbench in daylight: shop-white pages, chain-black type, bench
+ * grey for quieter bands, graphite for bike fitting and the footer, and one
+ * marker colour (workshop yellow by default, owner-editable) used as a fill:
+ * the main buttons, the stroke under highlighted words, the "not sure?" band,
+ * the booking band. The one ornament is the measuring scale — fine ticks with a
+ * longer one every fifth, never numbered — along the foot of the first photo,
+ * before section labels, down the job-sheet tracks and above the price note.
+ * Square, machined edges; left-aligned; the service list reads like a workshop
+ * price board: name and purpose left, time and price as two labelled figures.
+ */
+
+/* ── Shared pieces ────────────────────────────────────────── */
+
+/* A section's label (SectionMark.tsx): the number, a short length of the scale, the name. */
+.section-mark {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  gap: var(--space-3);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.section-mark__n {
+  color: var(--ink);
+}
+
+.section-mark__ticks {
+  inline-size: calc(var(--tick-step) * 10 + var(--tick-weight));
+}
+
+.section-mark--on-dark {
+  color: var(--on-forest-soft);
+}
+
+.section-mark--on-dark .section-mark__n {
+  color: var(--on-forest);
+}
+
+
+.sample-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.sample-note--on-dark {
+  color: var(--on-forest-faint);
+}
+
+.sample-note--on-dark .tag {
+  background: var(--forest-3);
+  color: var(--on-forest);
+}
+
+.tag--on-photo {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: 1;
+  background: color-mix(in oklab, var(--raised) 92%, transparent);
+  color: var(--ink);
+  pointer-events: none;
+}
+
+.open-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.open-status__dot {
+  inline-size: var(--status-dot);
+  block-size: var(--status-dot);
+  border-radius: var(--radius-pill);
+  background: var(--muted);
+  flex: none;
+}
+
+.open-status[data-open='true'] .open-status__dot {
+  background: var(--mark);
+  box-shadow: 0 0 0 3px var(--mark-halo);
+}
+
+.skeleton--service {
+  block-size: 6rem;
+  margin-bottom: var(--space-3);
+}
+
+.skeleton--row {
+  block-size: 1.5rem;
+  margin-bottom: var(--space-2);
+}
+
+/* Bands: bench grey for quieter sections, graphite for bike fitting. */
+.band {
+  background: var(--oat);
+}
+
+.dark {
+  background: var(--forest);
+  color: var(--on-forest-soft);
+}
+
+.dark h2,
+.dark h3,
+.dark dt {
+  color: var(--on-forest);
+}
+
+.dark .hl {
+  color: var(--on-forest);
+}
+
+.dark :focus-visible {
+  outline-color: var(--accent-glow);
+}
+
+/* ── Banners ──────────────────────────────────────────────── */
+
+.banner {
+  position: relative;
+  z-index: var(--layer-banner);
+  padding: var(--space-2) var(--gutter);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.banner p {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.banner--preview {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.banner--draft {
+  background: var(--accent-tint);
+  color: var(--ink);
+}
+
+.banner__dot {
+  inline-size: var(--status-dot);
+  block-size: var(--status-dot);
+  border-radius: var(--radius-pill);
+  background: var(--ply);
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--layer-header);
+  background: color-mix(in oklab, var(--raised) 94%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: var(--hairline) solid var(--rule);
+  transition: border-color var(--dur-quick) var(--ease-soft);
+}
+
+.site-header[data-at-top] {
+  border-bottom-color: transparent;
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  min-height: var(--header-height);
+}
+
+.site-header__home {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+}
+
+.wordmark__words {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+/* The name in condensed capitals, sitting on a short marker bar. */
+.wordmark__text {
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-wordmark);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--ink);
+  padding-bottom: 0.18em;
+  background: linear-gradient(var(--accent), var(--accent)) 0 100% / 1.4em 0.16em no-repeat;
+}
+
+.wordmark__descriptor {
+  font-family: var(--font-mono);
+  padding-left: var(--space-3);
+  border-left: var(--hairline) solid var(--line-soft);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.wordmark__logo {
+  block-size: var(--logo-height);
+  inline-size: auto;
+  max-inline-size: var(--logo-max);
+  object-fit: contain;
+}
+
+.site-nav {
+  display: none;
+}
+
+.site-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding-inline: var(--space-1);
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 80%;
+  background-size: 0 var(--rule-strong);
+  transition: background-size var(--dur-step) var(--ease-settle), color var(--dur-quick) var(--ease-soft);
+}
+
+.site-nav a:hover {
+  color: var(--ink);
+  background-size: 100% var(--rule-strong);
+}
+
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.site-header__wide {
+  display: none;
+}
+
+.menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  padding-inline: var(--space-3);
+  border: var(--hairline) solid var(--line-input);
+  border-radius: var(--radius-button);
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-strong);
+  cursor: pointer;
+}
+
+.site-menu {
+  border-top: var(--hairline) solid var(--rule);
+  background: var(--paper);
+  padding-block: var(--space-3) var(--space-5);
+}
+
+.site-menu ul {
+  list-style: none;
+  display: grid;
+}
+
+.site-menu a {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  min-height: var(--control);
+  padding-block: var(--space-3);
+  border-bottom: var(--hairline) solid var(--rule);
+  color: var(--ink);
+  font-family: var(--heading-font);
+  font-weight: var(--heading-weight);
+  font-size: var(--text-xl);
+  text-decoration: none;
+}
+
+.site-menu__n {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-strong);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Phones: the name alone, so Book and Menu always fit beside it. */
+@media (max-width: 599px) {
+  .wordmark__descriptor {
+    display: none;
+  }
+}
+
+@media (min-width: 600px) {
+  .site-header__wide {
+    display: inline;
+  }
+}
+
+@media (min-width: 1180px) {
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(var(--space-3), 1.4vw, var(--space-5));
+  }
+
+  .menu-toggle,
+  .site-menu {
+    display: none;
+  }
+}
+
+/* ── The first screen ─────────────────────────────────────── */
+
+.hero {
+  padding-block: var(--space-6) var(--space-8);
+  background: var(--raised);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.hero__inner {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-areas:
+    'text'
+    'visual'
+    'list';
+}
+
+.hero__text {
+  grid-area: text;
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  gap: var(--space-4);
+}
+
+.hero__title {
+  font-size: var(--text-hero);
+  line-height: var(--leading-display);
+  max-width: var(--measure-title);
+}
+
+.hero__lede {
+  max-width: var(--measure-lede);
+  font-size: var(--text-lg);
+  color: var(--ink-soft);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+  margin-top: var(--space-2);
+}
+
+.hero__unsure {
+  font-size: var(--text-sm);
+  text-align: left;
+}
+
+.hero__status {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.hero__visual {
+  grid-area: visual;
+  position: relative;
+  align-self: start;
+}
+
+.hero__photo {
+  aspect-ratio: 3 / 2;
+}
+
+/* The measuring scale along the photo's foot — the bench edge. */
+.hero__ticks {
+  margin-top: var(--space-2);
+}
+
+.hero__list {
+  grid-area: list;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+  padding-top: var(--space-3);
+  border-top: var(--rule-strong) solid var(--ink);
+}
+
+.hero__list-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hero__list ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+}
+
+.hero__list li {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-md);
+  color: var(--ink);
+}
+
+.hero__list li + li::before {
+  content: '·';
+  margin-right: var(--space-4);
+  color: var(--muted);
+}
+
+.hero__not {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.hero--text-only .hero__inner {
+  grid-template-areas:
+    'text'
+    'list';
+}
+
+/* The first screen settles in once; reduced motion skips it (tokens). */
+.hero__enter {
+  animation: rise var(--dur-enter) var(--ease-settle) both;
+}
+
+.hero__visual {
+  animation: settle var(--dur-photo) var(--ease-settle) both;
+}
+
+@media (min-width: 960px) {
+  .hero {
+    padding-block: var(--space-6) var(--space-7);
+  }
+
+  .hero__inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas:
+      'text visual'
+      'text list';
+    grid-template-rows: auto 1fr;
+    column-gap: clamp(var(--space-6), 4vw, var(--space-8));
+    row-gap: var(--space-5);
+    align-items: start;
+  }
+
+  .hero__text {
+    padding-top: var(--space-4);
+  }
+
+  .hero__photo {
+    max-height: var(--hero-photo-max);
+  }
+
+  .hero--text-only .hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'text'
+      'list';
+  }
+}
+
+/* Short laptop screens: a tighter first screen, so the photo and the actions both fit. */
+@media (min-width: 960px) and (max-height: 760px) {
+  .hero {
+    padding-top: var(--space-5);
+  }
+
+  .hero__title {
+    font-size: clamp(2.5rem, 1.2rem + 3.4vw, 4.25rem);
+  }
+
+  .hero__text {
+    gap: var(--space-3);
+    padding-top: var(--space-2);
+  }
+
+  .hero__lede {
+    font-size: var(--text-md);
+  }
+}
+
+/* ── 01 Services & prices ─────────────────────────────────── */
+
+.terms {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-5);
+  margin-bottom: var(--space-7);
+}
+
+.term {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding-top: var(--space-4);
+  border-top: var(--rule-strong) solid var(--ink);
+}
+
+.term__n {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.term__title {
+  font-family: var(--heading-font);
+  font-weight: var(--heading-weight);
+  font-size: var(--text-fact);
+  line-height: var(--leading-tight);
+  color: var(--ink);
+}
+
+.term__text {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+/* "Not sure what your bike needs?" — a band of marker colour with an ink button. */
+.unsure {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+  margin-bottom: var(--space-8);
+  padding: var(--space-5);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.unsure__title {
+  font-size: var(--text-xl);
+  color: var(--on-accent);
+}
+
+.unsure__body {
+  max-width: 56ch;
+  color: var(--on-accent);
+}
+
+.unsure :focus-visible {
+  outline-color: var(--on-accent);
+}
+
+.menu {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.kind {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.kind__head {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+}
+
+.kind__title {
+  font-size: var(--text-xl);
+}
+
+.kind__note {
+  max-width: 34ch;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.menu-list {
+  list-style: none;
+  padding: 0;
+  border-top: var(--rule-strong) solid var(--ink);
+}
+
+.item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'main'
+    'figures'
+    'book';
+  gap: var(--space-4);
+  padding-block: var(--space-5);
+  border-bottom: var(--hairline) solid var(--line-soft);
+}
+
+.item__main {
+  grid-area: main;
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+}
+
+.item__thumb {
+  inline-size: var(--service-thumb);
+  block-size: var(--service-thumb);
+  object-fit: cover;
+}
+
+.item__name {
+  font-size: var(--text-service);
+  line-height: var(--leading-tight);
+}
+
+.item__lead {
+  max-width: 62ch;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.item__for {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.item__for-label {
+  margin-right: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.item__figures {
+  grid-area: figures;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.item__figure {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+}
+
+.item__figure dt {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.item__figure dd {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.item__amount {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-price);
+  line-height: 1.1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Free is marked, like a tag: the one place a price wears the marker colour. */
+.item__figure--free .item__amount {
+  justify-self: start;
+  padding-inline: var(--space-2);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.item__fine {
+  font-size: var(--text-xs);
+  line-height: var(--leading-tight);
+  color: var(--muted);
+}
+
+.item__book {
+  grid-area: book;
+  justify-self: start;
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.price-note {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 68ch;
+  color: var(--ink-soft);
+}
+
+.price-note__ticks {
+  inline-size: calc(var(--tick-step) * 20 + var(--tick-weight));
+}
+
+@media (min-width: 720px) {
+  .terms {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .unsure {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    padding: var(--space-6);
+    column-gap: var(--space-6);
+  }
+
+  .item {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'main main'
+      'figures book';
+    align-items: end;
+  }
+
+  .item__figures {
+    grid-template-columns: repeat(2, var(--figure-w));
+    column-gap: var(--space-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .kind {
+    grid-template-columns: var(--kind-aside) minmax(0, 1fr);
+    column-gap: var(--space-7);
+  }
+
+  .kind__head {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-5));
+    align-self: start;
+    padding-top: var(--space-4);
+  }
+
+  .item {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas: 'main figures book';
+    column-gap: var(--space-6);
+    align-items: start;
+  }
+
+  .item__book {
+    align-self: start;
+  }
+
+  .price-note {
+    margin-left: calc(var(--kind-aside) + var(--space-7));
+  }
+}
+
+/* ── 02 On the bench (bench grey) ─────────────────────────── */
+
+.work__head .sample-note {
+  margin-top: var(--space-1);
+}
+
+/* Three columns, each an upright and a wide frame: they end level. */
+.work__grid {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.work__col {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
+}
+
+.work__frame {
+  position: relative;
+}
+
+.work__photo--portrait {
+  aspect-ratio: 4 / 5;
+}
+
+.work__photo--landscape {
+  aspect-ratio: 3 / 2;
+}
+
+.work__caption {
+  display: flex;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.work__caption::before {
+  content: '';
+  flex: none;
+  inline-size: var(--space-3);
+  block-size: var(--marker-bar);
+  margin-top: 0.55em;
+  background: var(--accent);
+  box-shadow: inset 0 0 0 var(--hairline) var(--accent-line);
+}
+
+@media (min-width: 600px) {
+  .work__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* The third column wraps under the first two as one wide pair. */
+  .work__grid[data-columns='3'] .work__col:nth-child(3) {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+@media (min-width: 960px) {
+  .work__grid,
+  .work__grid[data-columns='3'] {
+    grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  .work__grid[data-columns='2'] {
+    --cols: 2;
+  }
+
+  .work__grid[data-columns='1'] {
+    --cols: 1;
+    max-width: 30rem;
+  }
+
+  .work__grid[data-columns='3'] .work__col:nth-child(3) {
+    grid-column: auto;
+    grid-template-columns: none;
+  }
+
+  .work__col {
+    gap: var(--space-6);
+  }
+}
+
+/* ── 03 Bike fitting (graphite) ───────────────────────────── */
+
+.fitting__grid {
+  display: grid;
+  gap: var(--space-7);
+}
+
+.fitting__photos {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: end;
+}
+
+.fitting__main,
+.fitting__detail {
+  position: relative;
+}
+
+.fitting__main {
+  grid-column: 1 / 10;
+  grid-row: 1;
+}
+
+.fitting__detail {
+  grid-column: 8 / 13;
+  grid-row: 1;
+  margin-bottom: calc(-1 * var(--space-6));
+  padding: var(--space-2) 0 0 var(--space-2);
+  background: var(--forest);
+}
+
+.fitting__detail .tag--on-photo {
+  top: calc(var(--space-2) + var(--space-3));
+  left: calc(var(--space-2) + var(--space-3));
+}
+
+.fitting__photos--single .fitting__main,
+.fitting__photos--single .fitting__detail {
+  grid-column: 1 / 10;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+.fitting__photo {
+  aspect-ratio: 4 / 5;
+  background: var(--forest-2);
+}
+
+.fitting__body {
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
+}
+
+.fitting__head {
+  margin-bottom: var(--space-2);
+}
+
+.fitting__head .section-intro {
+  color: var(--on-forest-soft);
+}
+
+.fitting__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--on-forest-faint);
+}
+
+.dark .fitting__label {
+  color: var(--on-forest-faint);
+}
+
+.fit-steps {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  border-top: var(--hairline) solid var(--forest-line-strong);
+}
+
+.fit-step {
+  display: grid;
+  grid-template-columns: var(--space-7) minmax(0, 1fr);
+  column-gap: var(--space-3);
+  padding-block: var(--space-3);
+  border-bottom: var(--hairline) solid var(--forest-line);
+}
+
+.fit-step__n {
+  grid-row: span 2;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-md);
+  color: var(--accent-glow);
+  font-variant-numeric: tabular-nums;
+}
+
+.fit-step__title {
+  font-family: var(--heading-font);
+  font-weight: var(--heading-weight);
+  font-size: var(--text-md);
+  color: var(--on-forest);
+}
+
+.fit-step__text {
+  font-size: var(--text-sm);
+  color: var(--on-forest-soft);
+}
+
+.fitting__notes {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.fitting__note {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.fit-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  border-top: var(--rule-strong) solid var(--on-forest);
+}
+
+.fit-list__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name book'
+    'meta book';
+  align-items: center;
+  column-gap: var(--space-4);
+  padding-block: var(--space-3);
+  border-bottom: var(--hairline) solid var(--forest-line-strong);
+}
+
+.fit-list__name {
+  grid-area: name;
+  font-family: var(--heading-font);
+  font-weight: var(--heading-weight);
+  font-size: var(--text-card);
+  color: var(--on-forest);
+}
+
+.fit-list__meta {
+  grid-area: meta;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--on-forest-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.fit-list__book {
+  grid-area: book;
+}
+
+.dark .fit-list__book:focus-visible {
+  outline-color: var(--accent-glow);
+}
+
+@media (min-width: 720px) {
+  .fitting__notes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-6);
+  }
+}
+
+@media (min-width: 960px) {
+  .fitting__grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: clamp(var(--space-6), 5vw, var(--space-9));
+    align-items: start;
+  }
+
+  .fitting__photos {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-6));
+  }
+
+  .fitting__main {
+    grid-column: 1 / 11;
+  }
+
+  .fitting__detail {
+    grid-column: 7 / 13;
+    margin-bottom: calc(-1 * var(--space-8));
+  }
+}
+
+/* ── 04 How it works ──────────────────────────────────────── */
+
+.tracks {
+  display: grid;
+  gap: var(--space-7);
+}
+
+.track {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+.track__title {
+  font-size: var(--text-xl);
+}
+
+.track__ticks {
+  inline-size: 100%;
+}
+
+.track__steps {
+  list-style: none;
+  padding: 0;
+  display: grid;
+}
+
+.track__step {
+  display: grid;
+  grid-template-columns: var(--space-7) minmax(0, 1fr);
+  column-gap: var(--space-3);
+  padding-block: var(--space-4);
+  border-bottom: var(--hairline) solid var(--line-soft);
+}
+
+.track__n {
+  grid-row: span 2;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-xl);
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.track__step-title {
+  font-family: var(--heading-font);
+  font-weight: var(--heading-weight);
+  font-size: var(--text-card);
+  line-height: var(--leading-tight);
+  color: var(--ink);
+}
+
+.track__text {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+
+.process__note {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 68ch;
+  margin-top: var(--space-7);
+  padding: var(--space-4) var(--space-5);
+  border-left: var(--marker-bar) solid var(--accent);
+  background: var(--raised);
+  color: var(--ink-soft);
+}
+
+.process__note-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+@media (min-width: 960px) {
+  .tracks {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: clamp(var(--space-6), 5vw, var(--space-9));
+  }
+}
+
+/* ── 05 The workshop (bench grey) ─────────────────────────── */
+
+.workroom__grid {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-areas:
+    'head'
+    'photos'
+    'text'
+    'facts';
+}
+
+.workroom__head {
+  grid-area: head;
+  margin-bottom: 0;
+}
+
+.workroom__text {
+  grid-area: text;
+  display: grid;
+  gap: var(--space-4);
+  max-width: var(--measure);
+}
+
+.workroom__lead {
+  font-size: var(--text-lg);
+  color: var(--ink);
+}
+
+.workroom__photos {
+  grid-area: photos;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.workroom__room,
+.workroom__work {
+  position: relative;
+}
+
+.workroom__room {
+  grid-column: 1 / 11;
+  grid-row: 1;
+}
+
+.workroom__work {
+  grid-column: 5 / 13;
+  grid-row: 2;
+  margin-top: calc(-1 * var(--space-7));
+  padding: var(--space-2) 0 0 var(--space-2);
+  background: var(--oat);
+}
+
+.workroom__work .tag--on-photo {
+  top: calc(var(--space-2) + var(--space-3));
+  left: calc(var(--space-2) + var(--space-3));
+}
+
+.workroom__photos--single .workroom__room,
+.workroom__photos--single .workroom__work {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  margin-top: 0;
+  padding: 0;
+}
+
+.workroom__photo {
+  aspect-ratio: 3 / 2;
+}
+
+.workroom__caption {
+  padding-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.workroom__facts {
+  grid-area: facts;
+  display: grid;
+  gap: var(--space-5);
+}
+
+.workroom__facts > div {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  padding-top: var(--space-4);
+  border-top: var(--rule-strong) solid var(--ink);
+}
+
+.workroom__facts dt {
+  font-family: var(--heading-font);
+  font-weight: var(--heading-weight);
+  font-size: var(--text-fact);
+  letter-spacing: var(--heading-tracking);
+  color: var(--ink);
+}
+
+.workroom__facts dd {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+@media (min-width: 600px) {
+  .workroom__facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-6);
+  }
+}
+
+@media (min-width: 960px) {
+  .workroom__grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas:
+      'head photos'
+      'text photos'
+      'facts facts';
+    grid-template-rows: auto 1fr auto;
+    column-gap: clamp(var(--space-6), 5vw, var(--space-9));
+    row-gap: var(--space-5);
+    align-items: start;
+  }
+
+  .workroom__facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: var(--space-7);
+  }
+}
+
+/* ── 06 Good to know ──────────────────────────────────────── */
+
+.faq__grid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.faq__head {
+  margin-bottom: 0;
+}
+
+.faq__list {
+  border-top: var(--rule-strong) solid var(--ink);
+}
+
+.qa {
+  border-bottom: var(--hairline) solid var(--line-soft);
+}
+
+.qa summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: var(--control);
+  padding-block: var(--space-4);
+  cursor: pointer;
+  list-style: none;
+}
+
+.qa summary::-webkit-details-marker {
+  display: none;
+}
+
+.qa__q {
+  font-family: var(--heading-font);
+  font-weight: 500;
+  font-size: var(--text-card);
+  letter-spacing: var(--heading-tracking);
+  line-height: var(--leading-tight);
+  color: var(--ink);
+}
+
+.qa__icon {
+  position: relative;
+  flex: none;
+  inline-size: var(--space-5);
+  block-size: var(--space-5);
+}
+
+.qa__icon::before,
+.qa__icon::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  block-size: var(--rule-strong);
+  margin-top: calc(-1 * var(--hairline));
+  background: var(--ink);
+  transition: transform var(--dur-step) var(--ease-settle);
+}
+
+.qa__icon::after {
+  transform: rotate(90deg);
+}
+
+.qa[open] .qa__icon::after {
+  transform: rotate(0deg);
+}
+
+.qa__a {
+  padding-bottom: var(--space-5);
+  max-width: 64ch;
+  color: var(--ink-soft);
+}
+
+@media (min-width: 960px) {
+  .faq__grid {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: var(--space-8);
+  }
+
+  .faq__head {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-6));
+    align-self: start;
+  }
+}
+
+/* ── Booking band (marker yellow) ─────────────────────────── */
+
+/* The one place the marker colour fills a whole band: the call to book. Text on it is ink. */
+.book {
+  position: relative;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.book h2,
+.book .section-intro,
+.book .book__step,
+.book .book__text,
+.book .eyebrow {
+  color: var(--on-accent);
+}
+
+.book .eyebrow::before {
+  background: var(--on-accent);
+  box-shadow: none;
+}
+
+.book .hl {
+  background-image: linear-gradient(var(--on-accent), var(--on-accent));
+}
+
+.book :focus-visible {
+  outline-color: var(--on-accent);
+}
+
+/* The measuring scale along the band's top edge, in ink. */
+.book::before {
+  content: '';
+  position: absolute;
+  inset-inline: var(--gutter);
+  top: 0;
+  block-size: var(--tick-tall);
+  background: var(--ticks);
+}
+
+.book .button {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--on-forest);
+}
+
+.book .button:hover {
+  background: var(--forest-3);
+  border-color: var(--forest-3);
+}
+
+.book .notice,
+.book .contact-instead {
+  background: var(--raised);
+}
+
+.book__grid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.book__head {
+  margin-bottom: 0;
+}
+
+.book__head h2 {
+  font-size: var(--text-3xl);
+}
+
+.book__how {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-6);
+}
+
+.book__steps {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+  inline-size: 100%;
+}
+
+.book__steps li {
+  display: grid;
+  grid-template-columns: var(--space-6) minmax(0, 1fr);
+  column-gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: var(--hairline) solid color-mix(in oklab, var(--on-accent) 40%, transparent);
+}
+
+.book__n {
+  grid-row: span 2;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-xl);
+  line-height: 1;
+  color: var(--on-accent);
+}
+
+.book__step {
+  font-weight: var(--weight-strong);
+  color: var(--ink);
+}
+
+.book__text {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.book__loading {
+  max-width: var(--form-max);
+}
+
+@media (min-width: 960px) {
+  .book__grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+}
+
+/* ── 07 Visit ─────────────────────────────────────────────── */
+
+.visit__grid {
+  display: grid;
+  gap: var(--space-7);
+}
+
+.visit__col {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+.visit__col h3 {
+  padding-bottom: var(--space-3);
+  border-bottom: var(--rule-strong) solid var(--ink);
+  font-size: var(--text-xl);
+}
+
+.hours {
+  display: grid;
+}
+
+.hours__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-2);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.hours__row dt {
+  color: var(--ink);
+}
+
+.hours__row dd {
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.hours__row--today dt,
+.hours__row--today dd {
+  font-weight: var(--weight-strong);
+  color: var(--ink);
+}
+
+.hours__row--today dt::after {
+  content: 'Today';
+  margin-left: var(--space-2);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-1);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+  vertical-align: 0.1em;
+}
+
+.hours-changes {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.hours-changes h4 {
+  font-family: var(--font-text);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-strong);
+  letter-spacing: 0;
+}
+
+.hours-changes ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+}
+
+.contact {
+  display: grid;
+  gap: var(--space-2);
+  font-style: normal;
+}
+
+.contact__name {
+  font-family: var(--heading-font);
+  font-weight: 600;
+  font-size: var(--text-lg);
+  color: var(--ink);
+}
+
+.contact a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.contact__directions {
+  justify-self: start;
+}
+
+@media (min-width: 720px) {
+  .visit__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-7);
+  }
+}
+
+@media (min-width: 1024px) {
+  .visit__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ── Footer (graphite) ────────────────────────────────── */
+
+.site-footer {
+  background: var(--forest);
+  color: var(--on-forest-soft);
+  padding-block: var(--space-9) var(--space-6);
+}
+
+.site-footer a {
+  color: var(--on-forest);
+}
+
+/* The footer's Book button keeps ink on the marker colour. */
+.site-footer a.button {
+  color: var(--on-accent);
+}
+
+.site-footer :focus-visible {
+  outline-color: var(--accent-glow);
+}
+
+.site-footer__inner {
+  display: grid;
+  gap: var(--space-7);
+}
+
+.site-footer__brand {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-4);
+}
+
+.site-footer__name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-footer-name);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  line-height: 0.9;
+  color: var(--on-forest);
+  padding-bottom: 0.1em;
+  background: linear-gradient(var(--accent), var(--accent)) 0 100% / 1.2em 0.08em no-repeat;
+}
+
+.site-footer__tagline {
+  max-width: 40ch;
+}
+
+.site-footer__brand .button {
+  margin-top: var(--space-3);
+}
+
+.site-footer__col {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+.site-footer__label {
+  font-size: var(--text-micro);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--on-forest-faint);
+}
+
+.site-footer__col ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+}
+
+.site-footer__col ul a,
+.site-footer__contact a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  text-decoration: none;
+}
+
+.site-footer__col ul a:hover,
+.site-footer__contact a:hover {
+  text-decoration: underline;
+}
+
+.site-footer__contact {
+  display: grid;
+  font-style: normal;
+}
+
+.site-footer__meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+  padding-top: var(--space-4);
+  border-top: var(--hairline) solid var(--forest-line);
+  font-size: var(--text-sm);
+  color: var(--on-forest-faint);
+}
+
+.site-footer__staff {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--on-forest-soft);
+  font-size: var(--text-sm);
+}
+
+@media (min-width: 720px) {
+  .site-footer__inner {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
